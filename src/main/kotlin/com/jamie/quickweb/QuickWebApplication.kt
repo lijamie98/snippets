@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import java.util.*
 
 @SpringBootApplication
-class PolarBearApplication {
+class QuickWebApplication {
 }
 
 fun main(args: Array<String>) {
@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
     props["spring.application.name"] = "quickweb"
     props["server.port"] = 8080
 
-    val app = SpringApplication(PolarBearApplication::class.java)
+    val app = SpringApplication(QuickWebApplication::class.java)
     app.setDefaultProperties(props)
     app.run(*args)
 }

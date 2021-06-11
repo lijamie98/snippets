@@ -2,19 +2,24 @@ package com.jamie.quickweb.api
 
 import org.jetbrains.annotations.NotNull
 
-data class SiteResponse(
+data class SnippetRequest (
     @NotNull
-    var id: String,
+    val name: String,
     @NotNull
-    var siteId: String,
+    val expires_in: Long,
     @NotNull
-    var siteName: String
+    val snippet: String
 )
 
-data class SiteRequest(
+data class SnippetResponse (
     @NotNull
-    var siteId: String,
+    val url: String,
     @NotNull
-    var siteName: String
+    val name: String,
+    @NotNull
+    val expires_at: String,
+    @NotNull
+    val snippet: String,
+    @NotNull
+    val likes: Long
 )
-

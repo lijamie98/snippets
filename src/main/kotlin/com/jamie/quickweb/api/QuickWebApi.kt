@@ -1,36 +1,64 @@
 package com.jamie.quickweb.api
 
-import com.jamie.quickweb.model.SiteInfo
-import com.jamie.quickweb.service.QuickWebService
+import com.jamie.quickweb.model.Snippet
+import com.jamie.quickweb.service.SnippetService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.net.URL
+import java.time.Instant
+import java.time.LocalDateTime
+import java.util.*
+import javax.servlet.http.HttpServletRequest
 
 
 @RestController
 class QuickWebApi(
-    @Autowired private val qwService: QuickWebService
+    @Autowired private val snippetService: SnippetService
 ) {
-    @GetMapping("/quickweb/sites")
-    fun listSites(): List<SiteResponse> {
-        return qwService.listSites()
-            .map {
-                SiteResponse(it.id.toString(), it.siteId, it.siteName)
-            }
+    @PostMapping("/snippets")
+    fun createSnippet(@RequestBody snippetRequest: SnippetRequest, request: HttpServletRequest): ResponseEntity<SnippetResponse> {
+        val url = URL(request.requestURL.toString())
+        val path = url.path
+
+        var snippet = fromRequest(snippetRequest, url.toString())
+        snippet.expires_at += 30
+        snippet = snippetService.createSnippet(path + "/" + snippet.name, fromRequest(snippetRequest, url.toString()))
+
+        return ResponseEntity(
+            toResponse(snippet),
+            HttpStatus.CREATED
+        )
     }
 
-    @PostMapping("/quickweb/sites")
-    fun createSite(@RequestBody siteRequest: SiteRequest): ResponseEntity<SiteResponse> {
+    @GetMapping("/snippets/{snippetId}")
+    fun getSnippet(@PathVariable snippetId: String, request: HttpServletRequest): ResponseEntity<SnippetResponse> {
+        val url = URL(request.requestURL.toString())
+        val path = url.path
+        // use uri as ID
+        val snippet = snippetService.readSnippet(path)
+        return ResponseEntity(toResponse(snippet), HttpStatus.OK)
+    }
 
-        val site = qwService.createSite(SiteInfo(
-            siteId = siteRequest.siteId,
-            siteName = siteRequest.siteName
-        ))
+    @PostMapping("/snippets/{snippetId}/like")
+    fun likeSnippet(@PathVariable snippetId: String, request: HttpServletRequest): ResponseEntity<SnippetResponse> {
+        val snippet = snippetService.like("/snippets/$snippetId")
+        return ResponseEntity(toResponse(snippet), HttpStatus.OK)
+    }
 
-        return ResponseEntity(SiteResponse(site.id.toString(), site.siteId, site.siteName), HttpStatus.CREATED)
+
+    private fun fromRequest(sr: SnippetRequest, url:String) : Snippet {
+        var exp = System.currentTimeMillis() / 1000L
+        return Snippet(url, sr.name, exp, sr.snippet)
+    }
+
+    private fun toResponse(s: Snippet): SnippetResponse {
+        val exp = LocalDateTime.ofInstant(
+            Instant.ofEpochSecond(s.expires_at),
+            TimeZone.getDefault().toZoneId()
+        )
+
+        return SnippetResponse(s.url, s.name, exp.toString(), s.snippet, s.likes)
     }
 }

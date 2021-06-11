@@ -1,7 +1,7 @@
-package com.jamie.quickweb.api
+package com.jamie.snippets.api
 
-import com.jamie.quickweb.model.Snippet
-import com.jamie.quickweb.service.SnippetService
+import com.jamie.snippets.model.Snippet
+import com.jamie.snippets.service.SnippetService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -12,9 +12,14 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 
-
+/**
+ * Snippet api controller.
+ *
+ * @property snippetService The service that takes care of the snippet operations.
+ * @constructor
+ */
 @RestController
-class QuickWebApi(
+class SnippetApi(
     @Autowired private val snippetService: SnippetService
 ) {
     @PostMapping("/snippets")
@@ -47,18 +52,30 @@ class QuickWebApi(
         return ResponseEntity(toResponse(snippet), HttpStatus.OK)
     }
 
-
-    private fun fromRequest(sr: SnippetRequest, url:String) : Snippet {
+    /**
+     * Convert from SnippetRequest to Snippet.
+     *
+     * @param snippetRequest The snippet request
+     * @param url The url that is used for accessing the snippet.
+     * @return the converted snippet object.
+     */
+    private fun fromRequest(snippetRequest: SnippetRequest, url:String) : Snippet {
         var exp = System.currentTimeMillis() / 1000L
-        return Snippet(url, sr.name, exp, sr.snippet)
+        return Snippet(url, snippetRequest.name, exp, snippetRequest.snippet)
     }
 
-    private fun toResponse(s: Snippet): SnippetResponse {
+    /**
+     * Convert from a snippet to a SnippetResponse
+     *
+     * @param snippet Snippet object
+     * @return the converted SnippetResponse object.
+     */
+    private fun toResponse(snippet: Snippet): SnippetResponse {
         val exp = LocalDateTime.ofInstant(
-            Instant.ofEpochSecond(s.expires_at),
+            Instant.ofEpochSecond(snippet.expires_at),
             TimeZone.getDefault().toZoneId()
         )
 
-        return SnippetResponse(s.url, s.name, exp.toString(), s.snippet, s.likes)
+        return SnippetResponse(snippet.url, snippet.name, exp.toString(), snippet.snippet, snippet.likes)
     }
 }

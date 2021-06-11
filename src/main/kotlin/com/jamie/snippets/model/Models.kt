@@ -1,5 +1,9 @@
-package com.jamie.quickweb.model
+package com.jamie.snippets.model
 
+/**
+ * Snippet class.
+ *
+ */
 data class Snippet(
     val url: String,
     val name: String,

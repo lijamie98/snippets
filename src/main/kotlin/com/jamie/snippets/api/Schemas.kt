@@ -1,5 +1,8 @@
-package com.jamie.quickweb.api
+package com.jamie.snippets.api
 
+/**
+ * The API request and response data classes are defined here.
+ */
 import org.jetbrains.annotations.NotNull
 
 data class SnippetRequest (

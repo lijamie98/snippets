@@ -1,14 +1,22 @@
-package com.jamie.quickweb.service
+package com.jamie.snippets.service
 
-import com.jamie.quickweb.exceptions.NotFoundException
-import com.jamie.quickweb.model.Snippet
+import com.jamie.snippets.exceptions.AlreadyExistsException
+import com.jamie.snippets.exceptions.NotFoundException
+import com.jamie.snippets.model.Snippet
 import org.springframework.stereotype.Service
 
+/**
+ * Snippet service takes care of the snippet create/read/like operations.
+ *
+ * @constructor Create empty Snippet service
+ */
 @Service
 class SnippetService () {
     var snippets = HashMap<String, Snippet>()
 
     fun createSnippet(snippetId: String, snippet: Snippet) : Snippet {
+        if (snippets[snippetId] != null)
+            throw AlreadyExistsException("snippet already exists.")
         snippets[snippetId] = snippet
         return snippet
     }

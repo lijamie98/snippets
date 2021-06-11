@@ -1,6 +1,12 @@
 # Introduction
 Spring boot is used to shorten the development time. The RestController
 is also used for fast development.
+
+**********************
+This is added after the deadline:
+I forgot to mention the server runs at port-8080
+*********************
+
 # Language
 Kotlin is used because it is less verbose for development while maintains the 
 performance of Java. 
